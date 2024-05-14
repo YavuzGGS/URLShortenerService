@@ -1,0 +1,13 @@
+@URLShortenerService_HostAddress = http://localhost:5002
+
+### Shorten URL
+POST {{URLShortenerService_HostAddress}}/URL
+Content-Type: application/json
+
+{
+    "OriginalUrl": "https://www.sample-site.com/karriere/berufserfahrene/direkteinstieg/"
+}
+
+### Redirect from Short URL to Original URL
+GET {{URLShortenerService_HostAddress}}/URL/GUKA8w/
+Accept: application/json
