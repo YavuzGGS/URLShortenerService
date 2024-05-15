@@ -4,6 +4,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace URLShortenerService.Models
 {
+    /// <summary>
+    /// İsimlendirme URL,
+    /// ShortenedUrl
+    /// </summary>
     public class URL
     {
         [Key]
@@ -14,12 +18,14 @@ namespace URLShortenerService.Models
 
         [Required]
         [MaxLength(6)]
+        ///ShortenedUrl
         public string ShortUrl { get; set; }
 
         [Required]
         public string Domain { get; set; }
 
         [MaxLength(100)]
+        /// string?
         public string CustomShortUrl { get; set; }
     }
 

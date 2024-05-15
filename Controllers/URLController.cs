@@ -21,33 +21,37 @@ namespace URLShortenerService.Controllers
         [HttpPost]
         public ActionResult<string> ShortenURL([FromBody] ShortenURLRequestModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (Uri.TryCreate(model.OriginalUrl, UriKind.Absolute, out Uri validatedUri))
-                {
-                    string domain = validatedUri.GetLeftPart(UriPartial.Authority);
-                    string path = validatedUri.PathAndQuery;
+                return BadRequest(ModelState);
+            }
 
-                    string shortUrl = model.CustomShortUrl; 
-                    if (string.IsNullOrEmpty(shortUrl))
-                    {
-                        shortUrl = GenerateShortUrl(); 
-                    }
-                    if (_context.URLs.Any(u => u.CustomShortUrl == shortUrl))
-                    {
-                        return BadRequest("Custom short URL is already in use.");
-                    }
 
-                    var url = new URL { OriginalUrl = model.OriginalUrl, ShortUrl = shortUrl, Domain = domain, CustomShortUrl = model.CustomShortUrl };
-                    _context.URLs.Add(url);
-                    _context.SaveChanges();
-
-                    string fullShortenedUrl = $"{domain}/{shortUrl}/";
-                    return Created(fullShortenedUrl, fullShortenedUrl); 
-                }
+            if (!Uri.TryCreate(model.OriginalUrl, UriKind.Absolute, out Uri validatedUri))
+            {
                 return BadRequest("Invalid URL format");
             }
-            return BadRequest(ModelState);
+
+
+            string systemsLocalUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host}";
+            string path = validatedUri.PathAndQuery;
+
+            string shortUrl = model.CustomShortUrl;
+            if (string.IsNullOrEmpty(shortUrl))
+            {
+                shortUrl = GenerateShortUrl();
+            }
+            if (_context.URLs.Any(u => u.CustomShortUrl == shortUrl))
+            {
+                return BadRequest("Custom short URL is already in use.");
+            }
+
+            var url = new URL { OriginalUrl = model.OriginalUrl, ShortUrl = shortUrl, Domain = systemsLocalUrl, CustomShortUrl = model.CustomShortUrl };
+            _context.URLs.Add(url);
+            _context.SaveChanges();
+
+            string fullShortenedUrl = $"{systemsLocalUrl}/URL/{shortUrl}/";
+            return Created(fullShortenedUrl, fullShortenedUrl);
         }
 
         [HttpGet("{shortUrl}")]
@@ -56,7 +60,8 @@ namespace URLShortenerService.Controllers
             var url = _context.URLs.FirstOrDefault(u => u.ShortUrl == shortUrl);
             if (url != null)
             {
-                return Ok(new { OriginalUrl = url.OriginalUrl });
+                return base.Redirect(url.OriginalUrl);
+               // return Ok(new { OriginalUrl = url.OriginalUrl });
             }
             else
             {
