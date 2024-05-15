@@ -28,21 +28,27 @@ namespace URLShortenerService.Controllers
                     string domain = validatedUri.GetLeftPart(UriPartial.Authority);
                     string path = validatedUri.PathAndQuery;
 
-                    string shortUrl = GenerateShortUrl();
+                    string shortUrl = model.CustomShortUrl; 
+                    if (string.IsNullOrEmpty(shortUrl))
+                    {
+                        shortUrl = GenerateShortUrl(); 
+                    }
+                    if (_context.URLs.Any(u => u.CustomShortUrl == shortUrl))
+                    {
+                        return BadRequest("Custom short URL is already in use.");
+                    }
 
-                    var url = new URL { OriginalUrl = model.OriginalUrl, ShortUrl = shortUrl, Domain = domain };
+                    var url = new URL { OriginalUrl = model.OriginalUrl, ShortUrl = shortUrl, Domain = domain, CustomShortUrl = model.CustomShortUrl };
                     _context.URLs.Add(url);
                     _context.SaveChanges();
 
                     string fullShortenedUrl = $"{domain}/{shortUrl}/";
-                    return CreatedAtAction(url.OriginalUrl, new { shortUrl }, fullShortenedUrl);
+                    return Created(fullShortenedUrl, fullShortenedUrl); 
                 }
                 return BadRequest("Invalid URL format");
             }
             return BadRequest(ModelState);
         }
-
-
 
         [HttpGet("{shortUrl}")]
         public IActionResult Redirect(string shortUrl)
@@ -57,7 +63,6 @@ namespace URLShortenerService.Controllers
                 return NotFound();
             }
         }
-
 
         private string GenerateShortUrl()
         {

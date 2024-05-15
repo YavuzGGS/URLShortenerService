@@ -22,6 +22,11 @@ namespace URLShortenerService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("CustomShortUrl")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Domain")
                         .IsRequired()
                         .HasColumnType("TEXT");

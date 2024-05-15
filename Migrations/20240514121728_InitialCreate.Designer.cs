@@ -10,7 +10,7 @@ using URLShortenerService.Models;
 namespace URLShortenerService.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240511161757_InitialCreate")]
+    [Migration("20240514121728_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -24,6 +24,11 @@ namespace URLShortenerService.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("CustomShortUrl")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Domain")
                         .IsRequired()

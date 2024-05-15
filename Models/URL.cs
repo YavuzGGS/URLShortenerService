@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace URLShortenerService.Models
@@ -16,7 +17,10 @@ namespace URLShortenerService.Models
         public string ShortUrl { get; set; }
 
         [Required]
-        public string Domain { get; set; } 
+        public string Domain { get; set; }
+
+        [MaxLength(100)]
+        public string CustomShortUrl { get; set; }
     }
 
 }
